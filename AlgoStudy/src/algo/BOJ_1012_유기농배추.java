@@ -8,73 +8,68 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class BOJ_1012_유기농배추 {
-	static int M, N, K; // 가로 세로 배추개수
-	static int[][] arr; // 배추
-	static boolean[][] isVisited;
 
-	static int[] dx = { -1, 0, 1, 0 };
-	static int[] dy = { 0, 1, 0, -1 };
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = null;
+    static boolean[][] visit; // 방문 배열
+    static int N, M, K; // 입력
+    static int[][] cabbagePatch; // 배추밭
 
-		int T = Integer.parseInt(br.readLine());
-		for (int tc = 1; tc <= T; tc++) {
-			st = new StringTokenizer(br.readLine());
-			M = Integer.parseInt(st.nextToken());
-			N = Integer.parseInt(st.nextToken());
-			K = Integer.parseInt(st.nextToken());
+    // 4방 탐색할 곳
+    static int[] dRow = {-1, 0, 1, 0};
+    static int[] dCol = {0, 1, 0, -1};
 
-			arr = new int[M][N];
+    public static void main(String[] args) throws IOException {
+        int T = Integer.parseInt(br.readLine());
+        for (int tc = 0; tc < T; tc++) {
+            int earthWorm = 0;
+            input();
+            System.out.println(readyBFS(earthWorm));
+        } // end TestCase
+    }
+    private static void input() throws IOException {
+        st = new StringTokenizer(br.readLine());
+        M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        cabbagePatch = new int[M][N];
+        visit = new boolean[M][N];
+        for (int i = 0; i < K; i++) {
+            st = new StringTokenizer(br.readLine());
+            int row = Integer.parseInt(st.nextToken());
+            int col = Integer.parseInt(st.nextToken());
+            cabbagePatch[row][col] = 1;
+        }
+    }
 
-			isVisited = new boolean[M][N];
+    private static int readyBFS(int cnt) {
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (cabbagePatch[i][j] == 1 && !visit[i][j]) {
+                    BFS(i, j);
+                    cnt++;
+                }
+            }
+        }
+        return cnt;
+    }
 
-			for (int i = 0; i < K; i++) {
-				st = new StringTokenizer(br.readLine());
-				int X = Integer.parseInt(st.nextToken());
-				int Y = Integer.parseInt(st.nextToken());
 
-				arr[X][Y] = 1;
-			}
-
-			int cnt = 0;
-
-			for (int i = 0; i < M; i++) {
-				for (int j = 0; j < N; j++) {
-					if (arr[i][j] == 1 && !isVisited[i][j]) {
-						bfs(i, j);
-						cnt++;
-					}
-				}
-			}
-			System.out.println(cnt);
-		}
-	}
-
-	private static void bfs(int i, int j) {
-		Queue<int[]> q = new LinkedList<>();
-		isVisited[i][j] = true;
-		q.add(new int[] { i, j });
-
-		while (!q.isEmpty()) {
-			int[] poll = q.poll();
-			int x = poll[0];
-			int y = poll[1];
-
-			for (int d = 0; d < 4; d++) {
-				int nx = x + dx[d];
-				int ny = y + dy[d];
-
-				if (nx >= 0 && ny >= 0 && nx < M && ny < N) {
-					if (arr[nx][ny] == 1 && !isVisited[nx][ny]) {
-						isVisited[nx][ny] = true;
-						q.add(new int[] { nx, ny });
-					}
-				}
-			}
-		}
-
-	}
-
+    private static void BFS(int row, int col) {
+        visit[row][col] = true;
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[]{row, col});
+        while (!queue.isEmpty()) {
+            int[] num = queue.poll();
+            for (int d = 0; d < 4; d++) {
+                int dx = num[0] + dRow[d];
+                int dy = num[1] + dCol[d];
+                if (dx < M && dy < N && dx >= 0 && dy >= 0 && !visit[dx][dy] && cabbagePatch[dx][dy] == 1) {
+                    visit[dx][dy] = true;
+                    queue.add(new int[]{dx, dy});
+                }
+            }
+        }
+    }
 }
